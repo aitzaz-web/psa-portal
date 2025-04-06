@@ -23,8 +23,7 @@ function Home() {
           <div>
             <h3 className="font-semibold text-lg mb-1">🎉 Cultural Events</h3>
             <p>
-              Celebrate Eid, Basant, Independence Day and more with fun and
-              community.
+              Celebrate Eid, Independence Day and more with fun and community.
             </p>
           </div>
           <div>
