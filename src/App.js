@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Events from "./pages/Events";
 import Login from "./pages/Login";
+import Networking from "./pages/Networking"; // add this with your other imports
 
 function App() {
   return (
@@ -13,6 +14,8 @@ function App() {
         <Navbar />
         <div className="p-8">
           <Routes>
+            <Route path="/network" element={<Networking />} />
+
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/events" element={<Events />} />

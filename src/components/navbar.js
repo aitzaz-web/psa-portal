@@ -6,6 +6,10 @@ function Navbar() {
       <Link to="/" className="hover:text-green-200 font-semibold">
         Home
       </Link>
+      <Link to="/network" className="hover:text-green-200 font-semibold">
+        Network
+      </Link>
+
       <Link to="/about" className="hover:text-green-200 font-semibold">
         About
       </Link>
