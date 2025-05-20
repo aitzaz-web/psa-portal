@@ -1,24 +1,44 @@
-const users = [
-  {
-    name: "XYZ XYZ",
-    role: "Alumni",
-    gradYear: "Class of 2021",
-    major: "Computer Science",
-    location: "New York, NY",
-    email: "areeba@example.com",
-  },
-  {
-    name: "ABC ABC",
-    role: "Student",
-    gradYear: "Class of 2026",
-    major: "Economics",
-    location: "Ithaca, NY",
-    email: "hm456@cornell.edu",
-  },
-  // Add more people as needed
-];
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
+import { useAuth } from "../AuthContext";
 
 function Networking() {
+  const { user } = useAuth();
+  const [profiles, setProfiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "users"));
+        const usersList = querySnapshot.docs.map((doc) => doc.data());
+        setProfiles(usersList);
+        setLoading(false);
+      } catch (error) {
+        console.error("❌ Error fetching profiles:", error);
+      }
+    };
+
+    fetchProfiles();
+  }, []);
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-600 text-lg font-semibold">
+        Please log in to view the network.
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500 text-lg">
+        Loading profiles...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-green-50 px-6 py-16">
       <div className="max-w-6xl mx-auto">
@@ -32,25 +52,49 @@ function Networking() {
         </p>
 
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-          {users.map((user, index) => (
+          {profiles.map((profile, index) => (
             <div
               key={index}
               className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition duration-200"
             >
               <h2 className="text-xl font-semibold text-green-800 mb-1">
-                {user.name}
+                {profile.name}
               </h2>
-              <p className="text-sm text-gray-500">
-                {user.role} • {user.gradYear}
+              <p className="text-sm text-gray-500 mb-2">
+                {profile.role} • Class of {profile.gradYear}
               </p>
-              <p className="text-gray-700 mt-2">{user.major}</p>
-              <p className="text-gray-500">{user.location}</p>
-              <a
-                href={`mailto:${user.email}`}
-                className="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition text-sm font-medium"
-              >
-                Connect
-              </a>
+              <p className="text-gray-700">{profile.major}</p>
+              {profile.jobTitle && (
+                <p className="text-gray-600 italic">
+                  {profile.jobTitle} {profile.company && `@ ${profile.company}`}
+                </p>
+              )}
+              {profile.location && (
+                <p className="text-gray-500">{profile.location}</p>
+              )}
+              {profile.bio && (
+                <p className="mt-2 text-sm text-gray-600">{profile.bio}</p>
+              )}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {profile.linkedin && (
+                  <a
+                    href={profile.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700"
+                  >
+                    LinkedIn
+                  </a>
+                )}
+                {profile.email && (
+                  <a
+                    href={`mailto:${profile.email}`}
+                    className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700"
+                  >
+                    Connect
+                  </a>
+                )}
+              </div>
             </div>
           ))}
         </div>
