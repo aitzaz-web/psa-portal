@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
 import { useAuth } from "../AuthContext";
 
 function Networking() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedProfile, setExpandedProfile] = useState(null);
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -42,6 +45,29 @@ function Networking() {
   return (
     <div className="min-h-screen bg-green-50 px-6 py-16">
       <div className="max-w-6xl mx-auto">
+        {/* Back Button */}
+        <div className="mb-6">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200 font-medium"
+          >
+            <svg 
+              className="w-4 h-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M10 19l-7-7m0 0l7-7m-7 7h18" 
+              />
+            </svg>
+            Back to Home
+          </button>
+        </div>
+        
         <h1 className="text-4xl font-bold text-green-700 text-center mb-8">
           PSA Networking Portal
         </h1>
@@ -75,6 +101,33 @@ function Networking() {
               {profile.bio && (
                 <p className="mt-2 text-sm text-gray-600">{profile.bio}</p>
               )}
+              
+              {/* Contact Information - shown when expanded */}
+              {expandedProfile === index && profile.email && (
+                <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                  <h4 className="font-semibold text-green-800 mb-2">Contact Information:</h4>
+                  <div className="space-y-1">
+                    <p className="text-sm text-gray-700">
+                      <span className="font-medium">Email:</span> {profile.email}
+                    </p>
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={() => navigator.clipboard.writeText(profile.email)}
+                        className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs hover:bg-gray-200 transition duration-200"
+                      >
+                        Copy Email
+                      </button>
+                      <a
+                        href={`mailto:${profile.email}`}
+                        className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition duration-200"
+                      >
+                        Send Email
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div className="mt-4 flex flex-wrap gap-2">
                 {profile.linkedin && (
                   <a
@@ -87,12 +140,12 @@ function Networking() {
                   </a>
                 )}
                 {profile.email && (
-                  <a
-                    href={`mailto:${profile.email}`}
-                    className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700"
+                  <button
+                    onClick={() => setExpandedProfile(expandedProfile === index ? null : index)}
+                    className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700 transition duration-200"
                   >
-                    Connect
-                  </a>
+                    {expandedProfile === index ? 'Hide Contact' : 'Show Contact'}
+                  </button>
                 )}
               </div>
             </div>
